@@ -1,4 +1,4 @@
-console.log('digital_resource_glossary');
+console.log('digital_resource_glossary_combined');
 (function ($) {
     $(document).ready(function() {
         let originalTitles = {}; // Object to store the original HTML content of titles
@@ -18,11 +18,9 @@ console.log('digital_resource_glossary');
             const letters = {};
 
             $('.digital-resource-card--title > a').each(function() {
-                const title = $(this).text().trim().split(/\s+/);
-                title.forEach(word => {
-                    const firstLetter = word.charAt(0).toUpperCase();
-                    letters[firstLetter] = (letters[firstLetter] || 0) + 1;
-                });
+                const titleText = $(this).text().trim();
+                const firstLetter = titleText.charAt(0).toUpperCase();
+                letters[firstLetter] = (letters[firstLetter] || 0) + 1;
                 let titleId = $(this).closest('.digital-resource-card').attr('id');
                 if (titleId) {
                     originalTitles[titleId] = $(this).html(); // Store original HTML
@@ -57,27 +55,15 @@ console.log('digital_resource_glossary');
                     $(this).html(originalTitles[cardId]);
                 }
 
-                // Apply new highlighting only if not selecting "All"
+                let originalText = $(this).text();
                 if (selectedLetter !== 'All') {
-                    let originalText = $(this).text();
-                    let highlightedText = '';
-                    let matchFound = false;
+                    let firstLetter = originalText.substring(0, 1);
+                    let remainder = originalText.substring(1);
 
-                    originalText.split(/\s+/).forEach(function(word) {
-                        let firstLetter = word.substring(0, 1);
-                        let remainder = word.substring(1);
-
-                        if (firstLetter.toUpperCase() === selectedLetter.toUpperCase()) {
-                            highlightedText += '<span class="highlight">' + firstLetter + '</span>' + remainder + ' ';
-                            matchFound = true;
-                        } else {
-                            highlightedText += word + ' ';
-                        }
-                    });
-
-                    // Update HTML and show card if there was a match
-                    if (matchFound) {
-                        $(this).html(highlightedText.trim());
+                    if (firstLetter.toUpperCase() === selectedLetter) {
+                        // Highlight only the first letter if it matches
+                        let highlightedText = '<span class="highlight">' + firstLetter + '</span>' + remainder;
+                        $(this).html(highlightedText);
                         $(this).closest('.digital-resource-card').show();
                     }
                 } else {
